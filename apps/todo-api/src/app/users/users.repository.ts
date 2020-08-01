@@ -18,6 +18,14 @@ export class UsersRepository {
       .first();
   }
 
+  async findById(id: string): Promise<UserEntity> {
+    return await this.knex(TABLE_NAME)
+      .select('id', 'name', 'email')
+      .from(TABLE_NAME)
+      .where({ id })
+      .first();
+  }
+
   async create(user: UserEntity) {
     await this.knex(TABLE_NAME).insert(user);
   }

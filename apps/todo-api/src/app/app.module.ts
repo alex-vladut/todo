@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ConfigModule } from '@nestjs/config';
-
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './guards/auth.guard';
 import { configurations } from './config';
 import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
+import { TodosModule } from './todos/todos.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { DatabaseModule } from './database/database.module';
     }),
     DatabaseModule,
     UsersModule,
+    TodosModule,
   ],
+  providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
 })
 export class AppModule {}

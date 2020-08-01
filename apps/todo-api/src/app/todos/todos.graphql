@@ -1,0 +1,20 @@
+type Todo {
+  id: ID!
+  title: String!
+  user: User!
+  isCompleted: Boolean!
+}
+
+input FilterInput {
+  isCompleted: Boolean!
+}
+
+type Query {
+  listTodos(filter: FilterInput): [Todo]
+}
+
+type Mutation {
+  createTodo(title: String!): Todo
+  updateTodo(id: ID!, isCompleted: Boolean!): Todo
+  deleteTodo(id: ID!): Todo
+}

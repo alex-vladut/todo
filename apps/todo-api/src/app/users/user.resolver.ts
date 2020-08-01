@@ -6,7 +6,7 @@ import * as jwt from 'jsonwebtoken';
 import { UserEntity } from './user.entity';
 import { UsersRepository } from './users.repository';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from './auth.guard';
+import { AuthGuard } from '../guards/auth.guard';
 import { ConfigService } from '@nestjs/config';
 
 @Resolver('User')
