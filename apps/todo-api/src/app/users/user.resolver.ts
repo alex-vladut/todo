@@ -1,5 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { uuid } from 'uuidv4';
+import bcrypt from 'bcrypt';
 
 import { UserEntity } from './user.entity';
 import { UsersRepository } from './users.repository';
@@ -23,11 +24,27 @@ export class UserResolver {
       id: uuid(),
       name,
       email,
-      password, // TODO hash password
+      password: await bcrypt.hash(password, 10),
     };
 
     await this.repository.create(newUser);
 
     return { ...newUser, password: undefined };
+  }
+
+  @Mutation()
+  async login(
+    @Args('email') email: string,
+    @Args('password') password: string
+  ) {
+    const user = await this.repository.findByEmail(email);
+    if (!user) {
+      throw new Error('Wrong email or password');
+    }
+    const isPassCorrect = await await bcrypt.compare(password, user.password);
+    if (!isPassCorrect) {
+      throw new Error('Wrong email or password');
+    }
+    return { ...user, password: undefined };
   }
 }

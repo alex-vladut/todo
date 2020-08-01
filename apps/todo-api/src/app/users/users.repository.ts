@@ -24,7 +24,7 @@ export class UsersRepository {
 
   async findByEmail(email: string): Promise<UserEntity> {
     return await this.knex(TABLE_NAME)
-      .select('id', 'name', 'email')
+      .select('id', 'name', 'email', 'password')
       .from(TABLE_NAME)
       .where({ email })
       .first();
