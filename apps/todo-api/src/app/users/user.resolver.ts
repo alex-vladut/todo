@@ -9,6 +9,11 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { ConfigService } from '@nestjs/config';
 
+export interface AuthToken {
+  token: string;
+  refreshToken: string;
+}
+
 @Resolver('User')
 export class UserResolver {
   constructor(
@@ -44,7 +49,7 @@ export class UserResolver {
   async login(
     @Args('email') email: string,
     @Args('password') password: string
-  ) {
+  ): Promise<AuthToken> {
     const user = await this.repository.findByEmail(email);
     if (!user) {
       throw new Error('Wrong email or password');
@@ -53,9 +58,38 @@ export class UserResolver {
     if (!isPassCorrect) {
       throw new Error('Wrong email or password');
     }
+    const token = jwt.sign(
+      { ...user, password: undefined },
+      this.config.get('auth.secret'),
+      {
+        expiresIn: '1d',
+      }
+    );
+    const refreshToken = jwt.sign(
+      { userId: user.id },
+      this.config.get('auth.secret'),
+      {
+        expiresIn: '30d',
+      }
+    );
+    return { token, refreshToken };
+  }
+
+  @Mutation()
+  async refreshAccessToken(
+    @Args('refreshToken') refreshToken: string
+  ): Promise<String> {
+    const { userId } = jwt.verify(
+      refreshToken,
+      this.config.get('auth.secret')
+    ) as { userId: string };
+    const user = this.repository.findById(userId);
     return jwt.sign(
       { ...user, password: undefined },
-      this.config.get('auth.secret')
+      this.config.get('auth.secret'),
+      {
+        expiresIn: '1d',
+      }
     );
   }
 }

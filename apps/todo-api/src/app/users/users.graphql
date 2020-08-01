@@ -8,7 +8,13 @@ type Query {
   me: User
 }
 
+type AuthToken {
+  token: String!
+  refreshToken: String!
+}
+
 type Mutation {
   signUp(name: String, email: String, password: String): User
-  login(email: String, password: String): String
+  login(email: String!, password: String!): AuthToken
+  refreshAccessToken(refreshToken: String!): String
 }
