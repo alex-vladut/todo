@@ -7,6 +7,7 @@ import { configurations } from './config';
 import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { TodosModule } from './todos/todos.module';
+import { CommonsModule } from './commons/commons.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { TodosModule } from './todos/todos.module';
       isGlobal: true,
       load: configurations,
     }),
+    CommonsModule,
     DatabaseModule,
     UsersModule,
     TodosModule,
