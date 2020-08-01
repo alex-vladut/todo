@@ -1,17 +1,25 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver, Context } from '@nestjs/graphql';
 import { uuid } from 'uuidv4';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
 
 import { UserEntity } from './user.entity';
 import { UsersRepository } from './users.repository';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from './auth.guard';
+import { ConfigService } from '@nestjs/config';
 
 @Resolver('User')
 export class UserResolver {
-  constructor(private readonly repository: UsersRepository) {}
+  constructor(
+    private readonly repository: UsersRepository,
+    private readonly config: ConfigService
+  ) {}
 
   @Query('me')
-  async me(@Args('email') email: string): Promise<UserEntity> {
-    return await this.repository.findByEmail(email);
+  @UseGuards(AuthGuard)
+  async me(@Context('user') user: UserEntity): Promise<UserEntity> {
+    return user;
   }
 
   @Mutation()
@@ -41,10 +49,13 @@ export class UserResolver {
     if (!user) {
       throw new Error('Wrong email or password');
     }
-    const isPassCorrect = await await bcrypt.compare(password, user.password);
+    const isPassCorrect = await bcrypt.compare(password, user.password);
     if (!isPassCorrect) {
       throw new Error('Wrong email or password');
     }
-    return { ...user, password: undefined };
+    return jwt.sign(
+      { ...user, password: undefined },
+      this.config.get('auth.secret')
+    );
   }
 }

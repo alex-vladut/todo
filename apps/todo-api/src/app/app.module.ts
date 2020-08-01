@@ -10,6 +10,7 @@ import { UsersModule } from './users/users.module';
   imports: [
     GraphQLModule.forRoot({
       typePaths: ['./**/*.graphql'],
+      context: ({ req }) => ({ headers: req.headers }),
     }),
     ConfigModule.forRoot({
       isGlobal: true,

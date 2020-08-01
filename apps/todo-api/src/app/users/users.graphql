@@ -5,10 +5,10 @@ type User {
 }
 
 type Query {
-  me(email: String): User
+  me: User
 }
 
 type Mutation {
   signUp(name: String, email: String, password: String): User
-  login(email: String, password: String): User
+  login(email: String, password: String): String
 }
